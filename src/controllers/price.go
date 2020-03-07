@@ -57,7 +57,8 @@ func (p PriceController) Get(c *gin.Context) {
 		return
 	}
 
-	url := "https://api.coinmarketcap.com/v1/ticker/" + coin + "/?convert=" + c.Param("currency")
+	//url := "https://api.coinmarketcap.com/v1/ticker/" + coin + "/?convert=" + c.Param("currency")
+	url := "https://coinfalcon.com/api/v1/markets/" + coin + "-" + "btc"
 	var inputData requestResponseData
 	hasError := helpers.GetJSON(url, &inputData)
 	if hasError {
@@ -67,8 +68,8 @@ func (p PriceController) Get(c *gin.Context) {
 	}
 
 	data := &responseData{
-		price:    inputData[0].PriceUSD,
-		priceBtc: inputData[0].PriceBTC,
+		//price:    inputData[0].PriceUSD,
+		priceBtc: inputData[0].highest_bid,
 	}
 	helpers.CacheInstance.Set(cacheKey, data, cache.DefaultExpiration)
 

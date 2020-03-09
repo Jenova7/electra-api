@@ -68,8 +68,8 @@ func (p PriceController) Get(c *gin.Context) {
 	}
 
 	data := &responseData{
-		//price:    inputData[0].PriceUSD,
-		priceBtc: inputData[0].highest_bid,
+		price:    getBtcUsd(inputData[0].highest_bid), //Using bittrex BTC-USD
+		priceBtc: inputData[0].highest_bid, // Using coinfalcon
 	}
 	helpers.CacheInstance.Set(cacheKey, data, cache.DefaultExpiration)
 
@@ -78,4 +78,24 @@ func (p PriceController) Get(c *gin.Context) {
 		"price":    data.price,
 		"priceBtc": data.priceBtc,
 	})
+
+  func getBtcUsd(ecaSat){
+
+  url := "https://api.bittrex.com/api/v1.1/public/getticker?market=USD-BTC"
+  var inputDataUsd requestResponseData
+  hasError := helpers.GetJSON(url, &inputDataUsd)
+	if hasError {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error."})
+
+		return
+	}
+
+  data := &responseData{
+		btcUsdValue: inputDataUsd[0].result.Bid,
+    }
+
+  var ecaUsdValue = btcUsdValue * ecaSat 
+
+  return ecaUsdValue
+  }
 }
